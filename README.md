@@ -18,16 +18,57 @@ Replace this paragraph with your own summary of what your version does.
 ## How The System Works
 
 Explain your design in plain language.
-
+Real world recommenders combine user behavior, item metadata, and often hybrid models to surface what listeners will enjoy next by learning from both other users and the content itself. My version will prioritize a simple content based approach matching genre and mood first, then comparing numeric audio features like energy, tempo bpm, valence, danceability, and acousticness to score how closely songs fit a user’s taste.
 Some prompts to answer:
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+- What features does each `Song` use in your system?
+  - Song features: genre, mood, energy, tempo bpm, valence, danceability, acousticness.
+- What information does your `UserProfile` store?
+  - UserProfile: preferred genre, preferred mood, target numeric values for energy, tempo bpm, valence, danceability, acousticness.
+- How does your `Recommender` compute a score for each song?
+  - Score: compare a song’s genre/mood matches plus distance from the user’s numeric preferences the closer numeric values get higher score.
+- How do you choose which songs to recommend?
+  - It Recommends by ranking all songs by score and return the top matches.
 
-You can include a simple diagram or bullet list if helpful.
+> Finalized Algorithm Recipe
+
+1. Categorical Matching (Base Points)
+
++2.0 points if song's genre matches favorite_genre
++1.0 point if song's mood matches favorite_mood
+
+2. Numeric Feature Similarity (Scaled Points)
+
+For each numeric feature, compute similarity as 1 - abs(song_value - target_value) / max_range
+energy: max_range = 1.0 (0-1 scale)
+tempo_bpm: max_range = 200 (0-200 bpm)
+valence: max_range = 1.0
+danceability: max_range = 1.0
+acousticness: max_range = 1.0
+Multiply each similarity by a weight (e.g., 1.0 for all) and sum them
+Total similarity points: sum of weighted similarities (range 0-5.0 if 5 features × 1.0 weight)
+
+3. Total Score
+
+Total = genre_points + mood_points + similarity_points
+Range: 0 to 8.0 (2 + 1 + 5)
+
+4. Ranking and Selection
+
+Sort songs by total score descending
+Recommend top N songs (e.g., top 5)
+If ties, break by closest tempo match, then energy match
+
+5. Filtering (Optional)
+
+Only recommend songs with total score ≥ 3.0 to ensure relevance.
+
+* ## Potential Biases
+
+The dataset may favor popular genres. Over-focusing on genre and mood can lead to similar recommendations and less variety.
+
+
+
 
 ---
 
@@ -63,7 +104,7 @@ pytest
 ```
 
 You can add more tests in `tests/test_recommender.py`.
-
+![alt text](image.png)
 ---
 
 ## Experiments You Tried
