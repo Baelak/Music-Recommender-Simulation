@@ -2,32 +2,20 @@
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+This recommender scores songs based on how well they match a user's preferred genre, mood, energy, tempo, and other audio features. It ranks songs from best to worst match and shows the specific reasons each one was recommended. The system uses a simple point-based formula with no machine learning, making it easy to understand exactly why each song appears in the list.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
 Real world recommenders combine user behavior, item metadata, and often hybrid models to surface what listeners will enjoy next by learning from both other users and the content itself. My version will prioritize a simple content based approach matching genre and mood first, then comparing numeric audio features like energy, tempo bpm, valence, danceability, and acousticness to score how closely songs fit a user’s taste.
-Some prompts to answer:
 
-- What features does each `Song` use in your system?
   - Song features: genre, mood, energy, tempo bpm, valence, danceability, acousticness.
-- What information does your `UserProfile` store?
+
   - UserProfile: preferred genre, preferred mood, target numeric values for energy, tempo bpm, valence, danceability, acousticness.
-- How does your `Recommender` compute a score for each song?
+
   - Score: compare a song’s genre/mood matches plus distance from the user’s numeric preferences the closer numeric values get higher score.
-- How do you choose which songs to recommend?
+
   - It Recommends by ranking all songs by score and return the top matches.
 
 > Finalized Algorithm Recipe
@@ -104,30 +92,22 @@ pytest
 ```
 
 You can add more tests in `tests/test_recommender.py`.
+
 ![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
 ---
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
-
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+We cut the genre bonus in half and doubled the energy weight to see what would change. Almost nothing did — the top results stayed the same for most profiles, which showed how much the genre score was already controlling everything. We also tested three different user types and found that the more specific your taste, the better the results.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+The catalog is too small, most genres only have one song. The genre bonus is so strong it can override everything else. And the system never learns from what you liked before.
 
 ---
 
@@ -137,116 +117,77 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+- Late-Night Coder vs. Workout Warrior
+Complete opposites. The Coder gets quiet, slow lofi tracks while the Warrior gets loud, fast rock. No song appears in both lists.
+
+- Late-Night Coder vs. Sunday Morning
+Both prefer relaxed listening, but Sunday Morning pulls brighter pop while the Coder stays in low-energy territory.
+
+- Workout Warrior vs. Sunday Morning
+Both lists include Sunrise City and Gym Hero, but in reversed order and the Warrior ranks the more intense song first, Sunday Morning ranks the happier one first.
+
 
 
 ---
 
 ## 7. `model_card_template.md`
 
-Combines reflection and model card framing from the Module 3 guidance. :contentReference[oaicite:2]{index=2}  
 
 ```markdown
 # 🎧 Model Card - Music Recommender Simulation
 
 ## 1. Model Name
 
-Give your recommender a name, for example:
-
-> VibeFinder 1.0
+> Zema 1.0 ~ ዜማ 1.0
 
 ---
 
 ## 2. Intended Use
 
-- What is this system trying to do
-- Who is it for
-
-Example:
-
-> This model suggests 3 to 5 songs from a small catalog based on a user's preferred genre, mood, and energy level. It is for classroom exploration only, not for real users.
+> This recommender suggests songs based on a user's preferred genre, mood, and audio features like energy and tempo. It assumes the user knows what they like and can describe it with specific values. This is a classroom simulation, not a production system.
 
 ---
 
 ## 3. How It Works (Short Explanation)
 
-Describe your scoring logic in plain language.
-
-- What features of each song does it consider
-- What information about the user does it use
-- How does it turn those into a number
-
-Try to avoid code in this section, treat it like an explanation to a non programmer.
+> Each song is scored by checking if the genre and mood match, then measuring how close the song's energy, tempo, and other features are to what the user wants. Genre is worth the most points since it's the strongest signal. The final score combines all of that into a ranking.
 
 ---
 
 ## 4. Data
 
-Describe your dataset.
-
-- How many songs are in `data/songs.csv`
-- Did you add or remove any songs
-- What kinds of genres or moods are represented
-- Whose taste does this data mostly reflect
+> The catalog has 17 songs across 14 genres, including lofi, rock, pop, jazz, classical, and folk. Most genres only have one song, so the dataset is pretty thin. Moods like happy, chill, and intense are covered, but other tastes like metal, R&B, or country are mostly missing.
 
 ---
 
 ## 5. Strengths
 
-Where does your recommender work well
-
-You can think about:
-- Situations where the top results "felt right"
-- Particular user profiles it served well
-- Simplicity or transparency benefits
+> It works best when the user knows exactly what they want. If you're a lofi listener or a workout music person, the top result is almost always the right one. In those cases, the top result almost always felt right. Genre and mood matching does a good job of anchoring the recommendations to something meaningful before the numeric scores even factor in.
 
 ---
 
 ## 6. Limitations and Bias
 
-Where does your recommender struggle
-
-Some prompts:
-- Does it ignore some genres or moods
-- Does it treat all users as if they have the same taste shape
-- Is it biased toward high energy or one genre by default
-- How could this be unfair if used in a real product
+> Most genres only have one song. So the system always plays that song first, then fills the rest of the list with whatever it can find. It's less of a recommendation and more of a "here's the only option, plus some others.".
 
 ---
 
 ## 7. Evaluation
 
-How did you check your system
+> I tested three user profiles: a late night coder, a workout listener, and a Sunday morning listener. The top results matched what I expected, the right genre and mood came up first each time.
 
-Examples:
-- You tried multiple user profiles and wrote down whether the results matched your expectations
-- You compared your simulation to what a real app like Spotify or YouTube tends to recommend
-- You wrote tests for your scoring logic
-
-You do not need a numeric metric, but if you used one, explain what it measures.
+> I also tried doubling the energy weight and halving the genre bonus to see what changed. Most results stayed the same, but the top two lofi songs swapped positions by just 0.06 points, which shows how close those scores actually were.
 
 ---
 
 ## 8. Future Work
 
-If you had more time, how would you improve this recommender
-
-Examples:
-
-- Add support for multiple users and "group vibe" recommendations
-- Balance diversity of songs instead of always picking the closest match
-- Use more features, like tempo ranges or lyric themes
+> The biggest fix would be adding more songs per genre so results aren't dominated by a single track. It would also help to let users rate recommendations and adjust the weights over time based on what they actually like.
 
 ---
 
 ## 9. Personal Reflection
 
-A few sentences about what you learned:
-
-- What surprised you about how your system behaved
-- How did building this change how you think about real music recommenders
-- Where do you think human judgment still matters, even if the model seems "smart"
+> The biggest surprise was how much the genre bonus controlled everything. Even when we changed other weights, the top results barely moved. It was also interesting how a simple math formula can feel like a real recommendation app. I used AI tools to write and check the code faster, but I still had to verify the logic myself to catch edge cases. Next upgrade, I would want users to rate songs so the system could learn their taste over time.
 
